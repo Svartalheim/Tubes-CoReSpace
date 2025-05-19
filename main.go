@@ -450,7 +450,7 @@ func displaySpaces(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // SORTING ALGORITHMS
-// TODO: FUNGSI KEBAWAH SEMUANYA JADI SATU AJA
+// TODO: FUNGSI KEBAWAH SEMUANYA JADI SATU AJA, berdasarkan field yang ingin di sort eyyyeyeye
 
 // Selection Sort for sorting by name (ascending)
 func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
