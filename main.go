@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -87,6 +89,13 @@ func getUserChoice() int {
 	return choice
 }
 
+// Fungsi untuk membaca seluruh baris dengan spasi
+func readLine() string {
+	reader := bufio.NewReader(os.Stdin)
+	line, _ := reader.ReadString('\n')
+	return strings.TrimSpace(line)
+}
+
 // Fungsi untuk menambahkan item dari coworking space
 func addCoworkingSpace() {
 	// fmt.Println(spaceCount, spaces)
@@ -114,10 +123,9 @@ func addCoworkingSpace() {
 	fmt.Print("Price per hour: ")
 	fmt.Scanln(&space.PricePerHour)
 
-	// Tambahkan fasilitas - input tunggal
+	// Untuk input fasilitas
 	fmt.Print("Facilities: ")
-	var facilitiesInput string
-	fmt.Scanln(&facilitiesInput)
+	facilitiesInput := readLine()
 
 	// Pisahkan berdasarkan koma dan tambahkan fasilitas
 	if facilitiesInput != "" {

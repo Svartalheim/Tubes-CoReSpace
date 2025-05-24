@@ -4,7 +4,7 @@ A CLI application for managing and reviewing co-working spaces, built with Go us
 
 ## Features
 
-- Add new co-working spaces with details like name, location, capacity, price, and amenities
+- Add new co-working spaces with details like name, location, capacity, price, fasility ,and amenities
 - View all co-working spaces with various sorting options:
   - Sort by name (ascending/descending)
   - Sort by price (ascending/descending)
