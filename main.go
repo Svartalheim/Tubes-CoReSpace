@@ -8,6 +8,7 @@ import (
 const maximalSpaces int = 100
 
 var spaces [maximalSpaces]CoworkingSpace
+var lastUsedID int = 0 // Untuk melacak ID tertinggi yang sudah digunakan
 
 // untuk meng track jumlah coworking space yang ada, jika langsung didefinisikan maka akan statis tergantung maximalSpacesnya
 var spaceCount int
@@ -22,6 +23,7 @@ type CoworkingSpace struct {
 	Rating       float64
 	Reviews      [50]Review
 	ReviewCount  int
+	Facilities   []string
 }
 
 // Struktur objek pada review setiap corowking space
@@ -93,9 +95,9 @@ func addCoworkingSpace() {
 		return
 	}
 	var space CoworkingSpace
-	// TODO
-	// disini masih perlu perubahan karena ID setelah di delete akan menjadi ID yang sama dengan yang sudah ada
-	space.ID = spaceCount + 1
+	// Menggunakan ID yang lebih tinggi dari ID tertinggi yang pernah digunakan
+	lastUsedID++
+	space.ID = lastUsedID
 
 	fmt.Println("\nAdding a new co-working space:")
 	fmt.Print("Name: ")
@@ -111,16 +113,29 @@ func addCoworkingSpace() {
 
 	fmt.Print("Price per hour: ")
 	fmt.Scanln(&space.PricePerHour)
-	spaces[spaceCount] = space
-	fmt.Println("Co-working space added successfully!")
-	spaceCount++
 
+	// Untuk input fasilitas (dipisahkan dengan koma)
+	fmt.Print("Facilities: ")
+	var facilitiesInput string
+	fmt.Scanln(&facilitiesInput)
+
+	// Pisahkan berdasarkan koma dan tambahkan fasilitas
+	if facilitiesInput != "" {
+		facilities := strings.Split(facilitiesInput, ",")
+		for _, facility := range facilities {
+			space.Facilities = append(space.Facilities, strings.TrimSpace(facility))
+		}
+	}
+
+	spaces[spaceCount] = space
+	fmt.Println("Co-working space successfully added!")
+	spaceCount++
 }
 
 // Fungsi untuk menampilkan list coworking space yang ada
 func viewAllSpaces() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available.")
+		fmt.Println("No co-working space available.")
 		return
 	}
 
@@ -136,7 +151,7 @@ func viewAllSpaces() {
 	var sortChoice int
 	fmt.Scanln(&sortChoice)
 
-	// Copy array baru agar tidak memodifikasi array utama
+	// Salin array baru agar tidak memodifikasi array utama
 	var sortedSpaces [maximalSpaces]CoworkingSpace
 	for i := 0; i < spaceCount; i++ {
 		sortedSpaces[i] = spaces[i]
@@ -156,22 +171,23 @@ func viewAllSpaces() {
 	case 6:
 		sortByRatingDescending(sortedSpaces, spaceCount)
 	default:
-		fmt.Println("Invalid choice. Showing unsorted list.")
+		fmt.Println("Invalid choice. Displaying list without sorting.")
 	}
 
 	displaySpaces(sortedSpaces, spaceCount)
 }
 
-// mencari coworking space berdasarkan nama
+// Mencari coworking space berdasarkan nama
 func searchSpace() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available to search.")
+		fmt.Println("No co-working space available for searching.")
 		return
 	}
 
 	fmt.Println("\nSearch by:")
 	fmt.Println("1. Name")
 	fmt.Println("2. Location")
+	fmt.Println("3. Facilities")
 	fmt.Print("Enter your choice: ")
 
 	var searchChoice string
@@ -179,27 +195,30 @@ func searchSpace() {
 
 	var searchKey string
 
-	if !strings.Contains(searchChoice, "1") && !strings.Contains(searchChoice, "2") {
+	if !strings.Contains(searchChoice, "1") && !strings.Contains(searchChoice, "2") && !strings.Contains(searchChoice, "3") {
 		fmt.Println("Invalid choice.")
 		return
 	}
 
 	if searchChoice == "1" {
-		fmt.Print("Enter name to search: ")
+		fmt.Print("Enter the name to search for: ")
+		fmt.Scanln(&searchKey)
+		searchSpacesByField("1", searchKey)
 	} else if searchChoice == "2" {
-		fmt.Print("Enter location to search: ")
-
+		fmt.Print("Enter the location to search for: ")
+		fmt.Scanln(&searchKey)
+		searchSpacesByField("2", searchKey)
+	} else if searchChoice == "3" {
+		fmt.Print("Enter the facility to search for: ")
+		fmt.Scanln(&searchKey)
+		searchByFacility(searchKey)
 	}
-
-	fmt.Scanln(&searchKey)
-	searchSpacesByField(searchChoice, searchKey)
-
 }
 
-// mengubah isi data dari coworking space berdasarkan ID
+// Mengubah isi data dari coworking space berdasarkan ID
 func editSpace() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available to edit.")
+		fmt.Println("No co-working space available for editing.")
 		return
 	}
 
@@ -220,6 +239,7 @@ func editSpace() {
 	fmt.Println("2. Location")
 	fmt.Println("3. Capacity")
 	fmt.Println("4. Price per hour")
+	fmt.Println("5. Facilities")
 	fmt.Print("Enter your choice: ")
 
 	var editChoice int
@@ -227,29 +247,44 @@ func editSpace() {
 
 	switch editChoice {
 	case 1:
-		fmt.Print("Enter new name: ")
+		fmt.Print("Enter the new name: ")
 		fmt.Scanln(&spaces[index].Name)
 	case 2:
-		fmt.Print("Enter new location: ")
+		fmt.Print("Enter the new location: ")
 		fmt.Scanln(&spaces[index].Location)
 	case 3:
-		fmt.Print("Enter new capacity: ")
+		fmt.Print("Enter the new capacity: ")
 		fmt.Scanln(&spaces[index].Capacity)
 	case 4:
-		fmt.Print("Enter new price per hour: ")
+		fmt.Print("Enter the new price per hour: ")
 		fmt.Scanln(&spaces[index].PricePerHour)
+	case 5:
+		fmt.Print("Enter the new facilities: ")
+		var facilitiesInput string
+		fmt.Scanln(&facilitiesInput)
+
+		// Reset fasilitas
+		spaces[index].Facilities = nil
+
+		// Pisahkan berdasarkan koma dan tambahkan fasilitas
+		if facilitiesInput != "" {
+			facilities := strings.Split(facilitiesInput, ",")
+			for _, facility := range facilities {
+				spaces[index].Facilities = append(spaces[index].Facilities, strings.TrimSpace(facility))
+			}
+		}
 	default:
 		fmt.Println("Invalid choice.")
 		return
 	}
 
-	fmt.Println("Co-working space updated successfully!")
+	fmt.Println("Co-working space successfully updated!")
 }
 
-// menghapus item dari coworking space berdasarkan ID
+// Menghapus item dari coworking space berdasarkan ID
 func deleteSpace() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available to delete.")
+		fmt.Println("No co-working space available for deletion.")
 		return
 	}
 
@@ -274,7 +309,7 @@ func deleteSpace() {
 			spaces[i] = spaces[i+1]
 		}
 		spaceCount--
-		fmt.Println("Co-working space deleted successfully!")
+		fmt.Println("Co-working space successfully deleted!")
 	} else {
 		fmt.Println("Deletion cancelled.")
 	}
@@ -283,7 +318,7 @@ func deleteSpace() {
 // Fungsi untuk mereview sebuah coworking space
 func addReview() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available to review.")
+		fmt.Println("No co-working space available for review.")
 		return
 	}
 
@@ -299,7 +334,7 @@ func addReview() {
 	}
 
 	if spaces[index].ReviewCount >= 50 {
-		fmt.Println("Maximum number of reviews reached for this space!")
+		fmt.Println("Maximum review count reached for this space!")
 		return
 	}
 
@@ -333,13 +368,13 @@ func addReview() {
 	}
 	spaces[index].Rating = sum / float64(spaces[index].ReviewCount)
 
-	fmt.Println("Review added successfully!")
+	fmt.Println("Review successfully added!")
 }
 
 // Lihat review
 func viewReviews() {
 	if spaceCount == 0 {
-		fmt.Println("No co-working spaces available.")
+		fmt.Println("No co-working space available.")
 		return
 	}
 
@@ -368,6 +403,39 @@ func viewReviews() {
 		fmt.Printf("Rating: %.1f/5.0\n", review.Rating)
 		fmt.Printf("Comment: %s\n", review.Comment)
 		fmt.Println("---------------------------------------")
+	}
+}
+
+// Menampilkan detail sebuah corowking space
+func displaySpace(space CoworkingSpace) {
+	fmt.Printf("ID: %d\n", space.ID)
+	fmt.Printf("Name: %s\n", space.Name)
+	fmt.Printf("Location: %s\n", space.Location)
+	fmt.Printf("Capacity: %d people\n", space.Capacity)
+	fmt.Printf("Price: $%.2f per hour\n", space.PricePerHour)
+	fmt.Printf("Rating: %.1f/5.0 (%d review)\n", space.Rating, space.ReviewCount)
+
+	if len(space.Facilities) > 0 {
+		fmt.Print("Facilities: ")
+		for i, facility := range space.Facilities {
+			fmt.Print(facility)
+			if i < len(space.Facilities)-1 {
+				fmt.Print(", ")
+			}
+		}
+		fmt.Println()
+	}
+
+	fmt.Println("---------------------------------------")
+}
+
+// Menampilkan array of detail seluruh corowking space
+func displaySpaces(spaces [maximalSpaces]CoworkingSpace, count int) {
+	fmt.Println("\nAll Co-working Spaces:")
+	fmt.Println("---------------------------------------")
+
+	for i := 0; i < count; i++ {
+		displaySpace(spaces[i])
 	}
 }
 
@@ -404,11 +472,11 @@ func searchSpacesByField(field string, query string) {
 	}
 
 	if !found {
-		fmt.Println("No co-working spaces found matching your query.")
+		fmt.Println("No co-working space found that matches your search.")
 	}
 }
 
-// Classic Binary search by ID implementation
+// Implementasi Binary search by ID
 func binarySearchById(id int) int {
 	left := 0
 	right := spaceCount - 1
@@ -428,31 +496,39 @@ func binarySearchById(id int) int {
 	return -1
 }
 
-// Menampilkan detail sebuah corowking space
-func displaySpace(space CoworkingSpace) {
-	fmt.Printf("ID: %d\n", space.ID)
-	fmt.Printf("Name: %s\n", space.Name)
-	fmt.Printf("Location: %s\n", space.Location)
-	fmt.Printf("Capacity: %d people\n", space.Capacity)
-	fmt.Printf("Price: $%.2f per hour\n", space.PricePerHour)
-	fmt.Printf("Rating: %.1f/5.0 (%d reviews)\n", space.Rating, space.ReviewCount)
-	fmt.Println("---------------------------------------")
-}
+// Mencari coworking space berdasarkan fasilitas
+func searchByFacility(searchKey string) {
+	found := false
 
-// Menampilkan array of detail seluruh corowking space
-func displaySpaces(spaces [maximalSpaces]CoworkingSpace, count int) {
-	fmt.Println("\nAll Co-working Spaces:")
+	fmt.Println("\nCo-working space with facilities:", searchKey)
 	fmt.Println("---------------------------------------")
 
-	for i := 0; i < count; i++ {
-		displaySpace(spaces[i])
+	for i := 0; i < spaceCount; i++ {
+		hasFacility := false
+		facilityIndex := 0
+		for facilityIndex < len(spaces[i].Facilities) && !hasFacility {
+			facility := spaces[i].Facilities[facilityIndex]
+			if strings.Contains(strings.ToLower(facility), strings.ToLower(searchKey)) {
+				hasFacility = true
+			}
+			facilityIndex++
+		}
+
+		if hasFacility {
+			displaySpace(spaces[i])
+			found = true
+		}
+	}
+
+	if !found {
+		fmt.Println("No co-working space found with the specified facility.")
 	}
 }
 
-// SORTING ALGORITHMS
+// ALGORITMA PENGURUTAN
 // TODO: FUNGSI KEBAWAH SEMUANYA JADI SATU AJA, berdasarkan field yang ingin di sort eyyyeyeye
 
-// Selection Sort for sorting by name (ascending)
+// Selection Sort untuk pengurutan berdasarkan nama (ascending)
 func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		minIndex := i
@@ -467,7 +543,7 @@ func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Selection Sort for sorting by name (descending)
+// Selection Sort untuk pengurutan berdasarkan nama (descending)
 func sortByNameDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		maxIndex := i
@@ -482,7 +558,7 @@ func sortByNameDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Insertion Sort for sorting by price (ascending)
+// Insertion Sort untuk pengurutan berdasarkan harga (ascending)
 func sortByPriceAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
@@ -497,7 +573,7 @@ func sortByPriceAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Insertion Sort for sorting by price (descending)
+// Insertion Sort untuk pengurutan berdasarkan harga (descending)
 func sortByPriceDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
@@ -512,7 +588,7 @@ func sortByPriceDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Selection Sort for sorting by rating (ascending)
+// Selection Sort untuk pengurutan berdasarkan rating (ascending)
 func sortByRatingAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		minIndex := i
@@ -527,7 +603,7 @@ func sortByRatingAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Insertion Sort for sorting by rating (descending)
+// Insertion Sort untuk pengurutan berdasarkan rating (descending)
 func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
@@ -540,4 +616,11 @@ func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 
 		spaces[j+1] = key
 	}
+}
+
+// Untuk membaca seluruh baris termasuk spasi
+func readLineWithSpaces() string {
+	var input string
+	fmt.Scanf("%[^\n]", &input)
+	return input
 }
