@@ -361,7 +361,6 @@ func addReview() {
 	spaces[index].ReviewCount++
 
 	// Fungsi untuk menghitung rating
-	// TODO: Dibikin fungsi terpisah
 	var sum float64
 	for i := 0; i < spaces[index].ReviewCount; i++ {
 		sum += spaces[index].Reviews[i].Rating
@@ -526,8 +525,6 @@ func searchByFacility(searchKey string) {
 }
 
 // ALGORITMA PENGURUTAN
-// TODO: FUNGSI KEBAWAH SEMUANYA JADI SATU AJA, berdasarkan field yang ingin di sort eyyyeyeye
-
 // Selection Sort untuk pengurutan berdasarkan nama (ascending)
 func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
