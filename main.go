@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -89,13 +87,6 @@ func getUserChoice() int {
 	return choice
 }
 
-// Fungsi untuk membaca seluruh baris dengan spasi
-func readLine() string {
-	reader := bufio.NewReader(os.Stdin)
-	line, _ := reader.ReadString('\n')
-	return strings.TrimSpace(line)
-}
-
 // Fungsi untuk menambahkan item dari coworking space
 func addCoworkingSpace() {
 	// fmt.Println(spaceCount, spaces)
@@ -123,9 +114,10 @@ func addCoworkingSpace() {
 	fmt.Print("Price per hour: ")
 	fmt.Scanln(&space.PricePerHour)
 
-	// Untuk input fasilitas
+	// Untuk input fasilitas (dipisahkan dengan koma)
 	fmt.Print("Facilities: ")
-	facilitiesInput := readLine()
+	var facilitiesInput string
+	fmt.Scanln(&facilitiesInput)
 
 	// Pisahkan berdasarkan koma dan tambahkan fasilitas
 	if facilitiesInput != "" {
@@ -267,7 +259,7 @@ func editSpace() {
 		fmt.Print("Enter the new price per hour: ")
 		fmt.Scanln(&spaces[index].PricePerHour)
 	case 5:
-		fmt.Println("Enter the new facilities: ")
+		fmt.Print("Enter the new facilities: ")
 		var facilitiesInput string
 		fmt.Scanln(&facilitiesInput)
 
@@ -505,19 +497,21 @@ func binarySearchById(id int) int {
 }
 
 // Mencari coworking space berdasarkan fasilitas
-func searchByFacility(facility string) {
+func searchByFacility(searchKey string) {
 	found := false
 
-	fmt.Println("\nCo-working space with facilities:", facility)
+	fmt.Println("\nCo-working space with facilities:", searchKey)
 	fmt.Println("---------------------------------------")
 
 	for i := 0; i < spaceCount; i++ {
 		hasFacility := false
-		for _, facility := range spaces[i].Facilities {
-			if strings.Contains(strings.ToLower(facility), strings.ToLower(facility)) {
+		facilityIndex := 0
+		for facilityIndex < len(spaces[i].Facilities) && !hasFacility {
+			facility := spaces[i].Facilities[facilityIndex]
+			if strings.Contains(strings.ToLower(facility), strings.ToLower(searchKey)) {
 				hasFacility = true
-				break
 			}
+			facilityIndex++
 		}
 
 		if hasFacility {
@@ -622,4 +616,11 @@ func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 
 		spaces[j+1] = key
 	}
+}
+
+// Untuk membaca seluruh baris termasuk spasi
+func readLineWithSpaces() string {
+	var input string
+	fmt.Scanf("%[^\n]", &input)
+	return input
 }
