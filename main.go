@@ -148,8 +148,7 @@ func viewAllSpaces() {
 	fmt.Println("6. Rating (Descending)")
 	fmt.Print("Enter your choice: ")
 
-	var sortChoice int
-	fmt.Scanln(&sortChoice)
+	sortChoice := readInt() // Gunakan readInt() yang sudah ada
 
 	// Salin array baru agar tidak memodifikasi array utama
 	var sortedSpaces [maximalSpaces]CoworkingSpace
@@ -159,17 +158,17 @@ func viewAllSpaces() {
 
 	switch sortChoice {
 	case 1:
-		sortByNameAscending(sortedSpaces, spaceCount)
+		sortByNameAscending(&sortedSpaces, spaceCount)      // Tambah &
 	case 2:
-		sortByNameDescending(sortedSpaces, spaceCount)
+		sortByNameDescending(&sortedSpaces, spaceCount)     // Tambah &
 	case 3:
-		sortByPriceAscending(sortedSpaces, spaceCount)
+		sortByPriceAscending(&sortedSpaces, spaceCount)     // Tambah &
 	case 4:
-		sortByPriceDescending(sortedSpaces, spaceCount)
+		sortByPriceDescending(&sortedSpaces, spaceCount)    // Tambah &
 	case 5:
-		sortByRatingAscending(sortedSpaces, spaceCount)
+		sortByRatingAscending(&sortedSpaces, spaceCount)    // Tambah &
 	case 6:
-		sortByRatingDescending(sortedSpaces, spaceCount)
+		sortByRatingDescending(&sortedSpaces, spaceCount)   // Tambah &
 	default:
 		fmt.Println("Invalid choice. Displaying list without sorting.")
 	}
@@ -529,7 +528,7 @@ func searchByFacility(searchKey string) {
 // TODO: FUNGSI KEBAWAH SEMUANYA JADI SATU AJA, berdasarkan field yang ingin di sort eyyyeyeye
 
 // Selection Sort untuk pengurutan berdasarkan nama (ascending)
-func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByNameAscending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		minIndex := i
 		for j := i + 1; j < count; j++ {
@@ -544,7 +543,7 @@ func sortByNameAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // Selection Sort untuk pengurutan berdasarkan nama (descending)
-func sortByNameDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByNameDescending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		maxIndex := i
 		for j := i + 1; j < count; j++ {
@@ -559,7 +558,7 @@ func sortByNameDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // Insertion Sort untuk pengurutan berdasarkan harga (ascending)
-func sortByPriceAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByPriceAscending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
 		j := i - 1
@@ -574,7 +573,7 @@ func sortByPriceAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // Insertion Sort untuk pengurutan berdasarkan harga (descending)
-func sortByPriceDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByPriceDescending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
 		j := i - 1
@@ -589,7 +588,7 @@ func sortByPriceDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // Selection Sort untuk pengurutan berdasarkan rating (ascending)
-func sortByRatingAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByRatingAscending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 0; i < count-1; i++ {
 		minIndex := i
 		for j := i + 1; j < count; j++ {
@@ -604,7 +603,7 @@ func sortByRatingAscending(spaces [maximalSpaces]CoworkingSpace, count int) {
 }
 
 // Insertion Sort untuk pengurutan berdasarkan rating (descending)
-func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
+func sortByRatingDescending(spaces *[maximalSpaces]CoworkingSpace, count int) {
 	for i := 1; i < count; i++ {
 		key := spaces[i]
 		j := i - 1
@@ -616,6 +615,12 @@ func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 
 		spaces[j+1] = key
 	}
+}
+
+func readInt() int {
+    var value int
+    fmt.Scanln(&value)
+    return value
 }
 
 // Untuk membaca seluruh baris termasuk spasi
