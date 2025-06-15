@@ -615,9 +615,9 @@ func sortByRatingDescending(spaces [maximalSpaces]CoworkingSpace, count int) {
 	}
 }
 
-// Untuk membaca seluruh baris termasuk spasi
-func readLineWithSpaces() string {
-	var input string
-	fmt.Scanf("%[^\n]", &input)
-	return input
-}
+// // Untuk membaca seluruh baris termasuk spasi
+// func readLineWithSpaces() string {
+// 	var input string
+// 	fmt.Scanf("%[^\n]", &input)
+// 	return input
+// }
